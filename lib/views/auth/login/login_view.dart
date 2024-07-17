@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
@@ -5,6 +6,9 @@ import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/strings.dart';
 import 'package:flutter_application_1/views/auth/components/auth_button.dart';
 import 'package:flutter_application_1/views/auth/components/auth_text_field.dart';
+import 'package:flutter_application_1/views/auth/register/register_view.dart';
+import 'package:flutter_application_1/views/auth/user/forgot_password.dart';
+import 'package:flutter_application_1/views/home/home_view.dart';
 import 'package:get/get.dart';
 
 class LoginView extends StatefulWidget {
@@ -17,7 +21,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final TextEditingController emailTextController = TextEditingController();
   final TextEditingController passwordTextController = TextEditingController();
-  final AuthController _authController = Get.put(AuthController());
+  final AuthController _authController = Get.find<AuthController>();
   bool _btnDisabled = true;
   @override
   void initState() {
@@ -120,19 +124,27 @@ class _LoginViewState extends State<LoginView> {
                       _authController.validationErrors['password'] ?? null,
                 )),
             20.h,
-            const Align(
-              alignment: Alignment.centerRight,
-              child: Text(AppString.forgetPasswordString,
-                  style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppColors.primaryColor)),
+            GestureDetector(
+              onTap: () => {
+                _authController.validationErrors.forEach(
+                    (key, value) => _authController.validationErrors[key] = ''),
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (_) => const ForgotPassword()))
+              },
+              child: const Align(
+                alignment: Alignment.centerRight,
+                child: Text(AppString.forgetPasswordString,
+                    style: TextStyle(
+                        color: AppColors.primaryColor,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.primaryColor)),
+              ),
             ),
             25.h,
             Obx(() {
               return AuthButton(
-                label: AppString.registerString,
+                label: AppString.loginString,
                 onPressed: () async {
                   final responseData = await _authController.login(
                       email: emailTextController.text,
@@ -141,6 +153,7 @@ class _LoginViewState extends State<LoginView> {
                     emailTextController.clear();
                     passwordTextController.clear();
                   }
+                  Get.toNamed('/');
                 },
                 loading: _authController.isLoading.value,
                 disabled: _btnDisabled,
@@ -155,7 +168,14 @@ class _LoginViewState extends State<LoginView> {
                   style: TextStyle(fontSize: 16),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _authController.validationErrors.forEach((key, value) =>
+                        _authController.validationErrors[key] = '');
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (_) => const RegisterView()));
+                  },
                   child: const Text("Sign up",
                       style: TextStyle(
                           fontSize: 16,

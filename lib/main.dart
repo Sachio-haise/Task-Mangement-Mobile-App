@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/controller/auth_controller.dart';
+import 'package:flutter_application_1/controller/user_controller.dart';
 import 'package:flutter_application_1/views/auth/login/login_view.dart';
 import 'package:flutter_application_1/views/auth/register/register_view.dart';
+import 'package:flutter_application_1/views/auth/user/forgot_password.dart';
 import 'package:flutter_application_1/views/home/home_view.dart';
 import 'package:flutter_application_1/views/task/task_view.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(const MyApp());
+  Get.put(UserController());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+  MyApp({super.key});
+  final AuthController _authController = Get.put(AuthController());
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Task App',
       theme: ThemeData(
@@ -40,8 +47,17 @@ class MyApp extends StatelessWidget {
                   fontSize: 40,
                   color: Colors.black,
                   fontWeight: FontWeight.w300))),
-      // home: const HomeView()
-      home: LoginView(),
+      initialRoute: "/",
+      home: Obx(() {
+        return _authController.loginStatus.value
+            ? const HomeView()
+            : const LoginView();
+      }),
+      getPages: [
+        GetPage(name: '/', page: () => const HomeView()),
+        GetPage(name: '/login', page: () => const LoginView()),
+        GetPage(name: '/register', page: () => const RegisterView()),
+      ],
     );
   }
 }

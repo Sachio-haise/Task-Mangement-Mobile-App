@@ -6,4 +6,5 @@ class AppColors {
     Color(0xff4568dc),
     Color(0xffb06ab3),
   ];
+  static const Color yellowColor = Color.fromARGB(255, 196, 177, 11);
 }
