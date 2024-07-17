@@ -1,15 +1,18 @@
 import 'dart:convert';
-import 'dart:ffi';
 
+import 'package:flutter_application_1/controller/task_controller.dart';
 import 'package:flutter_application_1/models/token.dart';
 import 'package:flutter_application_1/models/user.dart';
 import 'package:flutter_application_1/services/auth_services_impl.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
-  var user = Rx<User?>(null);
+  var user = Rxn<User>();
   final AuthServicesImpl authServicesImpl = Get.put(AuthServicesImpl());
+  final TaskController taskController = Get.put(TaskController());
   var isLoading = false.obs;
+  var loginStatus = false.obs;
   Map<String, dynamic> validationErrors = {
     'username': '',
     'password': '',
@@ -17,11 +20,32 @@ class AuthController extends GetxController {
     'lastName': '',
   }.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    checkLoginStatus();
+  }
+
+  void checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.clear();
+    String? token = prefs.getString('token');
+    if (token != null && token.isNotEmpty) {
+      fetchUser(token);
+      taskController.loadTask();
+      loginStatus.value = true;
+    } else {
+      loginStatus.value = false;
+    }
+  }
+
   void fetchUser(String token) async {
     isLoading.value = true;
-    final getUser = await authServicesImpl.getUser(token);
-    if (getUser != null) {
-      user.value = getUser;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.setString("token", token);
+    final userData = await authServicesImpl.getUser(token);
+    if (userData != null) {
+      user.value = userData;
     }
     isLoading.value = false;
   }

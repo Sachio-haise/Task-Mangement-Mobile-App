@@ -8,12 +8,14 @@ class AuthButton extends StatelessWidget {
       required this.label,
       required this.onPressed,
       this.loading = false,
-      required this.disabled});
+      required this.disabled,
+      this.icon});
 
   final String label;
   final VoidCallback onPressed;
   final bool loading;
   final disabled;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +28,14 @@ class AuthButton extends StatelessWidget {
       color: disabled
           ? AppColors.primaryColor.withOpacity(0.6)
           : AppColors.primaryColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: loading
           ? const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("Processing",
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
-                const SizedBox(
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+                SizedBox(
                   width: 10,
                 ),
                 SizedBox(
@@ -46,12 +48,23 @@ class AuthButton extends StatelessWidget {
                 ),
               ],
             )
-          : Text(
-              label,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                icon != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 5),
+                        child: Icon(
+                          icon,
+                          color: AppColors.primaryColor,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                Text(
+                  label,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ],
             ),
     ));
   }

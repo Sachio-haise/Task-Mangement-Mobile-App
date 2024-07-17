@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
@@ -5,6 +6,8 @@ import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/strings.dart';
 import 'package:flutter_application_1/views/auth/components/auth_button.dart';
 import 'package:flutter_application_1/views/auth/components/auth_text_field.dart';
+import 'package:flutter_application_1/views/auth/login/login_view.dart';
+import 'package:flutter_application_1/views/home/home_view.dart';
 import 'package:get/get.dart';
 
 class RegisterView extends StatefulWidget {
@@ -20,7 +23,7 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController emailTextController = TextEditingController();
   final TextEditingController passwordTextController = TextEditingController();
 
-  final AuthController _authController = Get.put(AuthController());
+  final AuthController _authController = Get.find<AuthController>();
   bool _btnDisabled = true;
 
   @override
@@ -185,6 +188,7 @@ class _RegisterViewState extends State<RegisterView> {
                       lastNameTextController.clear();
                       emailTextController.clear();
                       passwordTextController.clear();
+                      Get.toNamed('/');
                     }
                   },
                   loading: _authController.isLoading.value,
@@ -199,7 +203,14 @@ class _RegisterViewState extends State<RegisterView> {
                     style: TextStyle(fontSize: 16),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _authController.validationErrors.forEach((key, value) =>
+                          _authController.validationErrors[key] = '');
+                      Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (_) => const LoginView()));
+                    },
                     child: const Text("Login",
                         style: TextStyle(
                             fontSize: 16,

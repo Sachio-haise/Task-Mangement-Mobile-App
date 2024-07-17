@@ -1,13 +1,15 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/token.dart';
 import 'package:flutter_application_1/models/user.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:flutter_application_1/services/error_handling_service.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class AuthServicesImpl extends GetxService {
   final String baseUrl = "http://localhost:8080";
+  final ErrorHandlingService errorHandlingService =
+      Get.put(ErrorHandlingService());
 
   Future<Token?> registerUser({
     required String email,
