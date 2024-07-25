@@ -10,10 +10,20 @@ class TaskController extends GetxController {
   var isLoading = false.obs;
   RxList<Task> tasks = <Task>[].obs;
   RxList<Task> filteredTasks = <Task>[].obs;
+  var completedTaskNumbers = 0.obs;
+  var unCompletedTaskNumbers = 0.obs;
 
   void loadTask() async {
     List<Task> taskData = await taskServicesImpl.getTasks();
     tasks.value = taskData;
+    completedTaskNumbers.value = taskData
+        .where((task) {
+          return task.status == "COMPLETED";
+        })
+        .toList()
+        .length;
+    unCompletedTaskNumbers.value =
+        taskData.where((task) => task.status == "INPROGRESS").toList().length;
     filteredTasks.value = taskData;
   }
 
@@ -40,6 +50,53 @@ class TaskController extends GetxController {
         );
     isLoading.value = false;
     if (responseData != null) {
+      loadTask();
+      return responseData;
+    } else {
+      return null;
+    }
+  }
+
+  Future<Task?> updateTask(
+      {required int taskId,
+      required String title,
+      required String description,
+      required String status,
+      required String priority,
+      required String userId,
+      required String dueDate,
+      required String dueTime,
+      required bool changeStatus
+      // required File file
+      }) async {
+    isLoading.value = true;
+    int index = tasks.indexWhere((task) => task.id == taskId);
+
+    if (status == 'COMPLETED' && changeStatus) {
+      status = "INPROGRESS";
+    } else if (status == 'INPROGRESS' && changeStatus) {
+      status = "COMPLETED";
+    }
+
+    if (index != -1) {
+      tasks[index].status = status;
+      filteredTasks[index].status = status;
+    }
+    final responseData = await taskServicesImpl.updateTask(
+        taskId: taskId,
+        title: title,
+        description: description,
+        status: status,
+        priority: priority,
+        userId: userId,
+        dueDate: dueDate,
+        dueTime: dueTime
+        // file: file
+        );
+    print(responseData);
+    isLoading.value = false;
+    if (responseData != null) {
+      loadTask();
       return responseData;
     } else {
       return null;

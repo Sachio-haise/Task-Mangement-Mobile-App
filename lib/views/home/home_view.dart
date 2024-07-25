@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/controller/task_controller.dart';
 import 'package:flutter_application_1/enum/sort_order.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
@@ -10,8 +11,9 @@ import 'package:flutter_application_1/utils/strings.dart';
 import 'package:flutter_application_1/views/home/components/app_slider.dart';
 import 'package:flutter_application_1/views/home/components/fab.dart';
 import 'package:flutter_application_1/views/home/components/home_app_bar.dart';
-import 'package:flutter_application_1/views/home/widgets/task.dart';
+import 'package:flutter_application_1/views/home/widgets/task_item.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 
@@ -28,6 +30,7 @@ class _HomeViewState extends State<HomeView> {
   final List<String> sortOptions = ['Date', 'Priority'];
   final List<String> statusOptions = ['ALL', 'COMPLETED', 'INPROGRESS'];
   String currentStatus = "ALL";
+  final AuthController _authController = Get.find<AuthController>();
   SortDateOrder _sortDateOrder = SortDateOrder.ascending;
   SortPriorityOrder _sortPriorityOrder = SortPriorityOrder.high;
 
@@ -117,32 +120,45 @@ class _HomeViewState extends State<HomeView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: CircularProgressIndicator(
-                      value: 1 / 3,
-                      backgroundColor: Colors.grey,
-                      valueColor:
-                          AlwaysStoppedAnimation(AppColors.primaryColor),
-                    ),
-                  ),
+                  Obx(() {
+                    return _taskController.filteredTasks.isNotEmpty
+                        ? SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: CircularProgressIndicator(
+                              value: _taskController.completedTaskNumbers /
+                                  _taskController.filteredTasks.length,
+                              backgroundColor: Colors.grey,
+                              valueColor: const AlwaysStoppedAnimation(
+                                  AppColors.primaryColor),
+                            ),
+                          )
+                        : const SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: CircularProgressIndicator(
+                              value: 1 / 3,
+                              backgroundColor: Colors.grey,
+                              valueColor: AlwaysStoppedAnimation(
+                                  AppColors.primaryColor),
+                            ),
+                          );
+                  }),
                   25.w,
                   Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppString.mainTitle,
-                        style: Theme.of(context).textTheme.displayLarge,
-                      ),
-                      3.h,
-                      Text(
-                        "1 of 3",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      )
-                    ],
-                  )
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppString.mainTitle,
+                          style: Theme.of(context).textTheme.displayLarge,
+                        ),
+                        3.h,
+                        Obx(() => Text(
+                              "${_taskController.completedTaskNumbers} of ${_taskController.filteredTasks.length}",
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ))
+                      ])
                 ],
               ),
             ),
@@ -262,6 +278,15 @@ class _HomeViewState extends State<HomeView> {
                                         _taskController.filteredTasks
                                             .remove(task);
                                       }),
+                                      Fluttertoast.showToast(
+                                        msg: "Task deleted successful!",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.TOP,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.green,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0,
+                                      ),
                                       print(
                                           _taskController.filteredTasks.length)
                                     },
@@ -279,27 +304,73 @@ class _HomeViewState extends State<HomeView> {
                                     )
                                   ],
                                 ),
-                                child: TaskItem(task: task));
+                                child: TaskItem(
+                                    task: task,
+                                    userId: _authController.user.value!.id,
+                                    updateTask: () async {
+                                      Fluttertoast.showToast(
+                                        msg: "Task updated successful!",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.TOP,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.green,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0,
+                                      );
+
+                                      final respondData =
+                                          await _taskController.updateTask(
+                                              changeStatus: true,
+                                              taskId: task.id,
+                                              title: task.name,
+                                              description: task.description,
+                                              status: task.status,
+                                              priority:
+                                                  task.priority.toString(),
+                                              userId: _authController
+                                                  .user.value!.id
+                                                  .toString(),
+                                              dueDate: task.dueDate,
+                                              dueTime: task.dueTime);
+                                      if (respondData != null) {
+                                        _sortTasks();
+                                        setState(() {
+                                          currentStatus = "ALL";
+                                        });
+                                      }
+                                    }));
                           })
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Lottie animate
-                            FadeInUp(
-                              child: SizedBox(
-                                width: 200,
-                                height: 200,
-                                child: Lottie.asset(lottieURL,
-                                    animate: _taskController.tasks.isNotEmpty
-                                        ? false
-                                        : true),
+                            if (_taskController.unCompletedTaskNumbers.value ==
+                                    0 ||
+                                _taskController.tasks.isEmpty)
+                              // Lottie animate
+                              FadeInUp(
+                                child: SizedBox(
+                                  width: 200,
+                                  height: 200,
+                                  child: Lottie.asset(lottieURL, animate: true),
+                                ),
                               ),
-                            ),
-
-                            // Sub Text
-                            FadeInUp(
-                                from: 30,
-                                child: const Text(AppString.doneAllTask))
+                            if (_taskController.unCompletedTaskNumbers.value ==
+                                    0 ||
+                                _taskController.tasks.isEmpty)
+                              // Sub Text
+                              FadeInUp(
+                                  from: 30,
+                                  child: const Text(AppString.doneAllTask)),
+                            if (_taskController.completedTaskNumbers.value ==
+                                    0 &&
+                                _taskController.tasks.isNotEmpty)
+                              // Sub Text
+                              FadeInUp(
+                                  from: 30,
+                                  child: const Text(
+                                    AppString.noCompleteTask,
+                                    style: TextStyle(fontSize: 16),
+                                  ))
                           ],
                         );
                 })),

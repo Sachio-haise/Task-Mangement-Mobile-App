@@ -32,8 +32,6 @@ class AuthController extends GetxController {
     String? token = prefs.getString('token');
     if (token != null && token.isNotEmpty) {
       fetchUser(token);
-      taskController.loadTask();
-      loginStatus.value = true;
     } else {
       loginStatus.value = false;
     }
@@ -45,6 +43,8 @@ class AuthController extends GetxController {
     await pref.setString("token", token);
     final userData = await authServicesImpl.getUser(token);
     if (userData != null) {
+      taskController.loadTask();
+      loginStatus.value = true;
       user.value = userData;
     }
     isLoading.value = false;

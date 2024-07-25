@@ -5,6 +5,7 @@ class User {
   final String firstName;
   final String lastName;
   final String email;
+  final String? description;
   final String role;
   final String? filePath;
 
@@ -13,6 +14,7 @@ class User {
       required this.firstName,
       required this.lastName,
       required this.email,
+      required this.description,
       required this.role,
       required this.filePath});
 
@@ -22,6 +24,7 @@ class User {
         firstName: json['firstName'],
         lastName: json['lastName'],
         email: json['email'],
+        description: json['description'],
         role: json['role'],
         filePath: json['filePath']);
   }
@@ -32,6 +35,7 @@ class User {
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
+      'description': description,
       'role': role,
       'filePath': filePath
     };

@@ -5,34 +5,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/controller/task_controller.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
+import 'package:flutter_application_1/helper/custom_btn.dart';
 import 'package:flutter_application_1/models/task.dart';
 import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/strings.dart';
-import 'package:flutter_application_1/views/auth/components/auth_button.dart';
-import 'package:flutter_application_1/views/home/home_view.dart';
 import 'package:flutter_application_1/views/task/components/date_time_selector.dart';
 import 'package:flutter_application_1/views/task/components/rap_text_field.dart';
 import 'package:flutter_application_1/views/task/components/task_view_app_bar.dart';
 import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-class TaskView extends StatefulWidget {
-  const TaskView({super.key});
+class TaskAddUpdate extends StatefulWidget {
+  TaskAddUpdate({
+    super.key,
+    this.taskId,
+    this.title,
+    this.description,
+    this.status,
+    this.priority,
+    this.dueDate,
+    this.dueTime,
+  });
+
+  int? taskId;
+  String? title;
+  String? description;
+  String? status;
+  int? priority;
+  String? dueDate;
+  String? dueTime;
 
   @override
-  State<TaskView> createState() => _TaskViewState();
+  State<TaskAddUpdate> createState() => _TaskAddUpdateState();
 }
 
-class _TaskViewState extends State<TaskView> {
+class _TaskAddUpdateState extends State<TaskAddUpdate> {
   final AuthController _authController = Get.find<AuthController>();
   final TaskController _taskController = Get.find<TaskController>();
   final TextEditingController titleTextController = TextEditingController();
   final TextEditingController descriptionTextController =
       TextEditingController();
 
-  final picker = ImagePicker();
+  // final picker = ImagePicker();
   final List<String> _statusOptions = ['INPROGRESS', 'COMPLETED'];
   final List<String> taskPriorityOptions = ['High', 'Medium', 'Low'];
   bool _btnDisabled = true;
@@ -45,16 +62,16 @@ class _TaskViewState extends State<TaskView> {
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
   DateFormat timeFormat = DateFormat('HH:mm');
 
-  Future pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        file.value = File(pickedFile.path);
-      } else {
-        print("No image selected");
-      }
-    });
-  }
+  // Future pickImage() async {
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  //   setState(() {
+  //     if (pickedFile != null) {
+  //       file.value = File(pickedFile.path);
+  //     } else {
+  //       print("No image selected");
+  //     }
+  //   });
+  // }
 
   Future<void> addTask() async {
     if (_btnDisabled) {
@@ -84,14 +101,90 @@ class _TaskViewState extends State<TaskView> {
       taskStatus.value = null;
       taskPriority.value = null;
       file.value = null;
+      Fluttertoast.showToast(
+        msg: "Task created successful!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+
       Get.toNamed('/');
+    } else {
+      Fluttertoast.showToast(
+        msg: "Something Went Wrong!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      print(responseData);
     }
-    print(responseData);
+  }
+
+  Future<void> updateTask() async {
+    if (_btnDisabled) {
+      return;
+    }
+    var userId = _authController.user.value!.id;
+    String priority;
+    if (taskPriority.value == 'High') {
+      priority = 0.toString();
+    } else if (taskPriority.value == 'Medium') {
+      priority = 1.toString();
+    } else {
+      priority = 2.toString();
+    }
+    print(taskStatus.value);
+    final responseData = await _taskController.updateTask(
+        changeStatus: false,
+        taskId: widget.taskId!,
+        title: titleTextController.text,
+        description: descriptionTextController.text,
+        status: taskStatus.value!,
+        priority: priority,
+        userId: userId.toString(),
+        // file: file.value!
+        dueDate: dueDateValue.value!,
+        dueTime: dueTimeValue.value!);
+    if (responseData != null) {
+      titleTextController.clear();
+      descriptionTextController.clear();
+      taskStatus.value = null;
+      taskPriority.value = null;
+      file.value = null;
+      Fluttertoast.showToast(
+        msg: "Task Updated Successful!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      Get.toNamed('/');
+    } else {
+      Fluttertoast.showToast(
+        msg: "Something Went Wrong!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      print(responseData);
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    _initCheck();
     titleTextController.addListener(_checkInputs);
     descriptionTextController.addListener(_checkInputs);
     // Add listeners to ValueNotifiers
@@ -111,6 +204,25 @@ class _TaskViewState extends State<TaskView> {
           dueDateValue.value == null ||
           dueTimeValue.value == null;
     });
+  }
+
+  void _initCheck() {
+    if (widget.taskId != null) {
+      setState(() {
+        titleTextController.text = widget.title!;
+        descriptionTextController.text = widget.description!;
+        taskStatus.value = widget.status!;
+        if (widget.priority == 0) {
+          taskPriority.value = 'High';
+        } else if (widget.priority == 1) {
+          taskPriority.value = 'Medium';
+        } else {
+          taskPriority.value = "Low";
+        }
+        dueDateValue.value = widget.dueDate!;
+        dueTimeValue.value = widget.dueTime!;
+      });
+    }
   }
 
   @override
@@ -142,52 +254,40 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
-  Widget _buildButtomSideButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+  Widget _buildTopSideText(TextTheme textTheme) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          MaterialButton(
-            onPressed: () {
-              titleTextController.clear();
-              descriptionTextController.clear();
-              taskStatus.value = null;
-              taskPriority.value = null;
-              file.value = null;
-              Get.toNamed('/');
-            },
-            minWidth: 160,
-            height: 55,
-            color: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.close,
-                  color: AppColors.primaryColor,
-                ),
-                5.w,
-                const Text(
-                  AppString.deleteTask,
-                  style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontWeight: FontWeight.bold),
-                )
-              ],
+          const SizedBox(
+            width: 75,
+            child: Divider(
+              thickness: 2,
             ),
           ),
-          Obx(() {
-            return SizedBox(
-                width: 160,
-                child: AuthButton(
-                  disabled: _btnDisabled,
-                  label: AppString.addNewTask,
-                  loading: _taskController.isLoading.value,
-                  onPressed: addTask,
-                ));
-          })
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: RichText(
+              text: TextSpan(
+                  text: widget.taskId != null
+                      ? AppString.updateCurrentTask
+                      : AppString.addNewTask,
+                  style: textTheme.titleLarge,
+                  children: const [
+                    TextSpan(
+                        text: AppString.taskStrnig,
+                        style: TextStyle(fontWeight: FontWeight.w400))
+                  ]),
+            ),
+          ),
+          const SizedBox(
+            width: 75,
+            child: Divider(
+              thickness: 2,
+            ),
+          ),
         ],
       ),
     );
@@ -350,38 +450,56 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
-  Widget _buildTopSideText(TextTheme textTheme) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
+  Widget _buildButtomSideButtons() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const SizedBox(
-            width: 75,
-            child: Divider(
-              thickness: 2,
+          MaterialButton(
+            onPressed: () {
+              titleTextController.clear();
+              descriptionTextController.clear();
+              taskStatus.value = null;
+              taskPriority.value = null;
+              file.value = null;
+              Get.toNamed('/');
+            },
+            minWidth: 160,
+            height: 55,
+            color: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.close,
+                  color: AppColors.primaryColor,
+                ),
+                5.w,
+                const Text(
+                  AppString.deleteTask,
+                  style: TextStyle(
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.bold),
+                )
+              ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: RichText(
-              text: TextSpan(
-                  text: AppString.addNewTask,
-                  style: textTheme.titleLarge,
-                  children: const [
-                    TextSpan(
-                        text: AppString.taskStrnig,
-                        style: TextStyle(fontWeight: FontWeight.w400))
-                  ]),
-            ),
-          ),
-          const SizedBox(
-            width: 75,
-            child: Divider(
-              thickness: 2,
-            ),
-          ),
+          Obx(() {
+            return SizedBox(
+                width: 160,
+                child: CustomBtn(
+                  disabled: _btnDisabled || _taskController.isLoading.value,
+                  label: widget.taskId != null
+                      ? AppString.updateCurrentTask
+                      : AppString.addNewTask,
+                  loading: _taskController.isLoading.value,
+                  color: AppColors.primaryColor,
+                  textColor: Colors.white,
+                  onPressed: widget.taskId != null ? updateTask : addTask,
+                ));
+          })
         ],
       ),
     );

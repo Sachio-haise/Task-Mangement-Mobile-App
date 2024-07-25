@@ -4,6 +4,9 @@ import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
 import 'package:flutter_application_1/models/user.dart';
 import 'package:flutter_application_1/utils/colors.dart';
+import 'package:flutter_application_1/views/details/details_page.dart';
+import 'package:flutter_application_1/views/home/home_view.dart';
+import 'package:flutter_application_1/views/profile/profile_view.dart';
 import 'package:get/get.dart';
 
 class AppSlider extends StatelessWidget {
@@ -11,12 +14,24 @@ class AppSlider extends StatelessWidget {
 
   final List<IconData> icons = [
     CupertinoIcons.home,
-    CupertinoIcons.person_fill,
     CupertinoIcons.settings,
     CupertinoIcons.info_circle_fill
   ];
 
-  final List<String> texts = ["Home", "Profile", "Settings", "Details"];
+  final List<Widget> pages = [
+    const HomeView(),
+    const ProfileView(),
+    const AppDetails(),
+  ];
+
+  String limitWords(String text, int limit) {
+    if (text.length > limit) {
+      return '${text.substring(0, limit)}...';
+    }
+    return text;
+  }
+
+  final List<String> texts = ["Home", "Settings", "Details"];
   final AuthController authController = Get.find<AuthController>();
 
   @override
@@ -36,14 +51,23 @@ class AppSlider extends StatelessWidget {
         if (user != null) {
           return Column(
             children: [
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-L102BdOGuunKMMJL3Ot8N7JPhx1ZdnLX1g&s"),
+              CircleAvatar(
+                radius: 60,
+                backgroundImage: NetworkImage(user.filePath != null
+                    ? user.filePath!
+                    : "https://cdn-icons-png.flaticon.com/512/5951/5951752.png"),
               ),
-              SizedBox(height: 14), // Adjusted to SizedBox for consistency
+              const SizedBox(
+                  height: 14), // Adjusted to SizedBox for consistency
               Text("${user.lastName} ${user.firstName}",
                   style: textTheme.displayMedium),
+              10.h,
+              Text(
+                user.description != null
+                    ? limitWords(user.description!, 35)
+                    : "",
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 10),
                 width: double.infinity,
@@ -52,9 +76,9 @@ class AppSlider extends StatelessWidget {
                   itemCount: icons.length,
                   itemBuilder: (BuildContext context, int index) {
                     return InkWell(
-                      onTap: () => print("msg"),
+                      onTap: () => {Get.to(() => pages[index])},
                       child: Container(
-                        margin: EdgeInsets.only(left: 10),
+                        margin: const EdgeInsets.only(left: 10),
                         child: ListTile(
                           leading: Icon(
                             icons[index],
@@ -63,7 +87,7 @@ class AppSlider extends StatelessWidget {
                           ),
                           title: Text(
                             texts[index],
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
                       ),

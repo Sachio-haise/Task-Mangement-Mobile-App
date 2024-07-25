@@ -2,6 +2,8 @@ class AppString {
   static const String mainTitle = "My Tasks";
   static const String deletedTask = "This task was deleted";
   static const String doneAllTask = "You Have Done All Tasks!👌";
+  static const String noCompleteTask =
+      "You still don't have any completed tasks!😢";
   static const String addNewTask = "Add New ";
   static const String updateCurrentTask = "Update ";
   static const String taskStrnig = "Task";
@@ -25,6 +27,7 @@ class AppString {
 
   static const String titleOfEmailField = "Email";
   static const String titleOfPasswordField = "Password";
+  static const String titleOfOldPasswordField = "Old Password";
   static const String titleOfRetypePasswordField = "Re-typePassword";
   static const String forgetPasswordString = "Forget Password?";
   static const String titleOffirstNameField = "First Name";
@@ -46,6 +49,9 @@ class AppString {
 
   static const String passwordString = "Password";
   static const String updatedString = "Updated";
+  static const String confirmString = "Confirm";
   static const String yourPwdHasBeenupdatedString =
       "Your password has been Updated!";
+  static const String profileInfoString = "Profile Info";
+  static const String passwordChangeString = "Change Password";
 }

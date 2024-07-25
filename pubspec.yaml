@@ -72,6 +72,9 @@ dependencies:
   # intl
   intl: ^0.19.0
 
+  # add this line to your dependencies
+  fluttertoast: 
+
 
 
 dev_dependencies:

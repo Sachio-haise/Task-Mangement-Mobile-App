@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/controller/user_controller.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
+import 'package:flutter_application_1/helper/custom_btn.dart';
+import 'package:flutter_application_1/helper/custom_text_field.dart';
 import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/strings.dart';
-import 'package:flutter_application_1/views/auth/components/auth_button.dart';
-import 'package:flutter_application_1/views/auth/components/auth_text_field.dart';
 import 'package:flutter_application_1/views/auth/login/login_view.dart';
 import 'package:flutter_application_1/views/auth/user/components/back_button.dart';
 import 'package:flutter_application_1/views/auth/user/components/forgot_pwd_app_bar.dart';
@@ -122,18 +122,21 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 style: TextStyle(fontSize: 15, color: AppColors.primaryColor),
               ),
               20.h,
-              AuthButton(
-                  label: AppString.loginString,
-                  onPressed: () => {
-                        _changeCondition(''),
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => const LoginView(),
-                          ),
-                        )
-                      },
-                  disabled: false)
+              CustomBtn(
+                label: AppString.loginString,
+                onPressed: () => {
+                  _changeCondition(''),
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => const LoginView(),
+                    ),
+                  )
+                },
+                disabled: false,
+                textColor: Colors.white,
+                color: AppColors.primaryColor,
+              )
             ],
           ),
         ),
@@ -195,7 +198,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ],
               ),
               Obx(() {
-                return AuthTextField(
+                return CustomTextField(
                   controller: passwordController,
                   isForPwd: true,
                   errorMessage: _userController.validationErrors['password'],
@@ -219,14 +222,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ],
               ),
               Obx(() {
-                return AuthTextField(
+                return CustomTextField(
                   controller: confirmPasswordController,
                   isForPwd: true,
                   errorMessage: _userController.validationErrors['password'],
                 );
               }),
               15.h,
-              AuthButton(
+              CustomBtn(
                   label: "Update",
                   onPressed: () async {
                     final responseData = await _userController.resetPassword(
@@ -239,7 +242,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       });
                     }
                   },
-                  disabled: _pwdBtnDisabled || _userController.isLoading.value)
+                  color: AppColors.primaryColor,
+                  textColor: Colors.white,
+                  disabled: _pwdBtnDisabled || _userController.isLoading.value),
             ],
           ),
         ),
@@ -417,14 +422,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ],
               ),
               Obx(() {
-                return AuthTextField(
+                return CustomTextField(
                   controller: emailController,
                   errorMessage: _userController.validationErrors['username'],
                 );
               }),
               5.h,
               Obx(() {
-                return AuthButton(
+                return CustomBtn(
                     label: "Send Email",
                     onPressed: () async {
                       final responseData = await _userController.forgetPassword(
@@ -437,6 +442,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       print("condition: $condition");
                     },
                     loading: _userController.isLoading.value,
+                    color: AppColors.primaryColor,
+                    textColor: Colors.white,
                     disabled: _btnDisabled || _userController.isLoading.value);
               })
             ],

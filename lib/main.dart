@@ -3,11 +3,11 @@ import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/controller/user_controller.dart';
 import 'package:flutter_application_1/views/auth/login/login_view.dart';
 import 'package:flutter_application_1/views/auth/register/register_view.dart';
-import 'package:flutter_application_1/views/auth/user/forgot_password.dart';
+import 'package:flutter_application_1/views/details/details_page.dart';
 import 'package:flutter_application_1/views/home/home_view.dart';
-import 'package:flutter_application_1/views/task/task_view.dart';
+import 'package:flutter_application_1/views/profile/profile_view.dart';
+import 'package:flutter_application_1/views/task/task_add_update.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   Get.put(UserController());
@@ -57,6 +57,9 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/', page: () => const HomeView()),
         GetPage(name: '/login', page: () => const LoginView()),
         GetPage(name: '/register', page: () => const RegisterView()),
+        GetPage(name: '/app-details', page: () => const AppDetails()),
+        GetPage(name: '/task', page: () => TaskAddUpdate()),
+        GetPage(name: '/profile', page: () => const ProfileView()),
       ],
     );
   }

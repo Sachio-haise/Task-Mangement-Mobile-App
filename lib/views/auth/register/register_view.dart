@@ -2,12 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/auth_controller.dart';
 import 'package:flutter_application_1/extensions/space_exts.dart';
+import 'package:flutter_application_1/helper/custom_btn.dart';
+import 'package:flutter_application_1/helper/custom_text_field.dart';
 import 'package:flutter_application_1/utils/colors.dart';
 import 'package:flutter_application_1/utils/strings.dart';
-import 'package:flutter_application_1/views/auth/components/auth_button.dart';
-import 'package:flutter_application_1/views/auth/components/auth_text_field.dart';
 import 'package:flutter_application_1/views/auth/login/login_view.dart';
-import 'package:flutter_application_1/views/home/home_view.dart';
 import 'package:get/get.dart';
 
 class RegisterView extends StatefulWidget {
@@ -104,7 +103,7 @@ class _RegisterViewState extends State<RegisterView> {
                   )
                 ],
               ),
-              Obx(() => AuthTextField(
+              Obx(() => CustomTextField(
                     controller: firstNameTextController,
                     errorMessage: _authController.validationErrors['firstName'],
                   )),
@@ -125,7 +124,7 @@ class _RegisterViewState extends State<RegisterView> {
                   )
                 ],
               ),
-              Obx(() => AuthTextField(
+              Obx(() => CustomTextField(
                     controller: lastNameTextController,
                     errorMessage: _authController.validationErrors['lastName'],
                   )),
@@ -146,7 +145,7 @@ class _RegisterViewState extends State<RegisterView> {
                   )
                 ],
               ),
-              Obx(() => AuthTextField(
+              Obx(() => CustomTextField(
                     controller: emailTextController,
                     errorMessage: _authController.validationErrors['username'],
                   )),
@@ -167,7 +166,7 @@ class _RegisterViewState extends State<RegisterView> {
                   )
                 ],
               ),
-              Obx(() => AuthTextField(
+              Obx(() => CustomTextField(
                     controller: passwordTextController,
                     isForPwd: true,
                     errorMessage:
@@ -175,7 +174,7 @@ class _RegisterViewState extends State<RegisterView> {
                   )),
               25.h,
               Obx(() {
-                return AuthButton(
+                return CustomBtn(
                   label: AppString.registerString,
                   onPressed: () async {
                     final responseData = await _authController.register(
@@ -192,7 +191,9 @@ class _RegisterViewState extends State<RegisterView> {
                     }
                   },
                   loading: _authController.isLoading.value,
-                  disabled: _btnDisabled,
+                  disabled: _btnDisabled || _authController.isLoading.value,
+                  textColor: Colors.white,
+                  color: AppColors.primaryColor,
                 );
               }),
               Row(

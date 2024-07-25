@@ -3,7 +3,7 @@ class Task {
   final String name;
   final String description;
   final int priority;
-  final String status;
+  String status;
   final String filePath;
   final String created_at;
   final String updated_at;

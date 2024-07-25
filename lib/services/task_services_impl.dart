@@ -88,6 +88,55 @@ class TaskServicesImpl extends GetxService {
     }
   }
 
+  Future<Task?> updateTask(
+      {required int taskId,
+      required String title,
+      required String description,
+      required String status,
+      required String priority,
+      required String userId,
+      required String dueDate,
+      required String dueTime
+      // required File file
+      }) async {
+    // make endpoint url
+    var url = Uri.parse("$baseUrl/api/v1/task/update/$taskId");
+
+    // extract token
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString("token");
+
+    // make request for file
+    var request = http.MultipartRequest("POST", url);
+
+    // set header
+    request.headers['Authorization'] = "Bearer $token";
+    request.headers['Content-Type'] = "multipart/form-data";
+
+    // add data
+    request.fields.addAll({
+      'name': title,
+      'description': description,
+      'status': status,
+      'priority': priority,
+      'userId': userId,
+      'dueDate': dueDate,
+      'dueTime': dueTime
+    });
+    // request.files.add(multipartFile);
+    final response = await request.send();
+    var responseData = await http.Response.fromStream(response);
+    if (response.statusCode == 200) {
+      var data = jsonDecode(responseData.body)['task'];
+      print("the task is ${data}");
+
+      return Task.fromJson(data);
+    } else {
+      print("Fail to add task : ${responseData.body}");
+      return null;
+    }
+  }
+
   Future<void> deleteTask({required String taskId}) async {
     // extract token
     SharedPreferences prefs = await SharedPreferences.getInstance();
