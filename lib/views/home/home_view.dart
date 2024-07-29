@@ -333,7 +333,7 @@ class _HomeViewState extends State<HomeView> {
                                               dueDate: task.dueDate,
                                               dueTime: task.dueTime);
                                       if (respondData != null) {
-                                        _sortTasks();
+                                        // _sortTasks();
                                         setState(() {
                                           currentStatus = "ALL";
                                         });

@@ -7,7 +7,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class AuthServicesImpl extends GetxService {
-  final String baseUrl = "http://localhost:8080";
+  final String baseUrl =
+      "https://spring-task-crud-with-security-and-s3.onrender.com";
   final ErrorHandlingService errorHandlingService =
       Get.put(ErrorHandlingService());
 

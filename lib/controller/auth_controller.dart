@@ -28,7 +28,7 @@ class AuthController extends GetxController {
 
   void checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.clear();
+    prefs.clear();
     String? token = prefs.getString('token');
     if (token != null && token.isNotEmpty) {
       fetchUser(token);

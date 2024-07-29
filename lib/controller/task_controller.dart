@@ -70,7 +70,7 @@ class TaskController extends GetxController {
       // required File file
       }) async {
     isLoading.value = true;
-    int index = tasks.indexWhere((task) => task.id == taskId);
+    int index = filteredTasks.indexWhere((task) => task.id == taskId);
 
     if (status == 'COMPLETED' && changeStatus) {
       status = "INPROGRESS";

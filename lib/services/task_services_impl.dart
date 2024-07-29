@@ -8,7 +8,8 @@ import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskServicesImpl extends GetxService {
-  final String baseUrl = "http://localhost:8080";
+  final String baseUrl =
+      "https://spring-task-crud-with-security-and-s3.onrender.com";
 
   Future<List<Task>> getTasks() async {
     var url = Uri.parse("$baseUrl/api/v1/task");

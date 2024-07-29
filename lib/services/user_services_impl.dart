@@ -11,7 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserServicesImpl extends GetxService {
   final AuthController _authController = Get.put(AuthController());
-  final String baseUrl = "http://localhost:8080";
+  final String baseUrl =
+      "https://spring-task-crud-with-security-and-s3.onrender.com";
   final ErrorHandlingService errorHandlingService =
       Get.put(ErrorHandlingService());
 
